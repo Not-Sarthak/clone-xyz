@@ -1,4 +1,4 @@
-import { Button } from "@/components/button"
+import { Button } from "@/components/buttons/button"
 import Link from "next/link"
 import { siteConfig } from "./siteConfig"
 

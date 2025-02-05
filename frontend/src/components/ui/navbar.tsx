@@ -7,7 +7,7 @@ import { RiCloseFill, RiMenuFill } from "@remixicon/react"
 import Link from "next/link"
 import React from "react"
 import { CloneLogo } from "../../../public/clone-logo"
-import { Button } from "../button"
+import { Button } from "../buttons/button"
 
 export function NavBar() {
   const [open, setOpen] = React.useState(false)
@@ -44,12 +44,9 @@ export function NavBar() {
               </Link>
             </div>
           </nav>
-          <Button
-            variant="secondary"
-            className="hidden h-10 font-semibold sm:block"
-          >
-            Deploy Agent
-          </Button>
+          <div className="flex items-center gap-2">
+            <appkit-button />
+          </div>
           <Button
             onClick={() => setOpen(!open)}
             variant="secondary"

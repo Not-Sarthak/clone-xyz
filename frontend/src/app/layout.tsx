@@ -5,6 +5,11 @@ import "./globals.css"
 import Footer from "@/components/ui/footer"
 import { NavBar } from "@/components/ui/navbar"
 import { siteConfig } from "./siteConfig"
+import { ThemeProvider } from "@/providers/theme-provider"
+import ContextProvider from "@/providers/context"
+import { cookieToInitialState } from "wagmi"
+import { wagmiAdapter } from "@/config"
+import { headers } from "next/headers"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://yoururl.com"),
@@ -37,19 +42,28 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const initialState = cookieToInitialState(
+    wagmiAdapter.wagmiConfig,
+    (await headers()).get("cookie"),
+  )
+
   return (
     <html lang="en">
       <body
         className={`${GeistSans.className} min-h-screen overflow-x-hidden scroll-auto bg-gray-50 antialiased selection:bg-orange-100 selection:text-orange-600`}
       >
-        <NavBar />
-        {children}
-        <Footer />
+        <ContextProvider initialState={initialState}>
+          <ThemeProvider attribute="class" defaultTheme="dark">
+            <NavBar />
+            {children}
+            <Footer />
+          </ThemeProvider>
+        </ContextProvider>
       </body>
     </html>
   )
