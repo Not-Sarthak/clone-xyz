@@ -2,10 +2,12 @@ import FeatureDivider from "@/components/ui/feature-divider"
 import Features from "@/components/ui/features"
 import { Hero } from "@/components/ui/hero"
 import { AgentAnalytics } from "@/components/ui/agent-analytics"
+import { NavBar } from "@/components/headers/navbar"
 
 export default function Home() {
   return (
     <main className="relative mx-auto flex flex-col">
+      <NavBar />
       <div className="pt-56">
         <Hero />
       </div>

@@ -33,14 +33,14 @@ export function NavBar() {
           </Link>
           <nav className="hidden sm:block md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:transform">
             <div className="flex items-center gap-10 font-medium">
-              <Link className="px-2 py-1 text-gray-900" href="#solutions">
-                Features
+              <Link className="px-2 py-1 text-gray-900" href="/showcase">
+                Showcase
               </Link>
-              <Link className="px-2 py-1 text-gray-900" href="#templates">
+              <Link className="px-2 py-1 text-gray-900" href="/templates">
                 Templates
               </Link>
-              <Link className="px-2 py-1 text-gray-900" href="#analytics">
-                Analytics
+              <Link className="px-2 py-1 text-gray-900" href="#">
+                Documentation
               </Link>
             </div>
           </nav>

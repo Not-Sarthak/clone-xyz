@@ -3,7 +3,6 @@ import type { Metadata } from "next"
 import "./globals.css"
 
 import Footer from "@/components/ui/footer"
-import { NavBar } from "@/components/ui/navbar"
 import { siteConfig } from "./siteConfig"
 import { ThemeProvider } from "@/providers/theme-provider"
 import ContextProvider from "@/providers/context"
@@ -59,7 +58,6 @@ export default async function RootLayout({
       >
         <ContextProvider initialState={initialState}>
           <ThemeProvider attribute="class" defaultTheme="dark">
-            <NavBar />
             {children}
             <Footer />
           </ThemeProvider>
