@@ -39,7 +39,7 @@ export function NavBar({ items, className, onTabChange }: NavBarProps) {
   return (
     <nav className={cx("w-full", className)}>
       <div className="inline-flex">
-        <div className="flex items-center gap-3 rounded-full border border-orange-200 bg-white/90 px-1 py-1 shadow-md">
+        <div className="flex items-center gap-3 rounded-md border border-orange-200 bg-white/90 px-1 py-1 shadow-md">
           {items.map((item) => {
             const Icon = item.icon
             const isActive = activeTab === item.name

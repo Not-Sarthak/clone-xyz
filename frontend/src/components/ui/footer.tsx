@@ -35,9 +35,7 @@ const Footer = () => {
         id="footer"
         className="relative mx-auto flex max-w-6xl flex-wrap pt-4"
       >
-        {/* Vertical Lines */}
         <div className="pointer-events-none inset-0">
-          {/* Left */}
           <div
             className="absolute inset-y-0 my-[-5rem] w-px"
             style={{
@@ -57,7 +55,6 @@ const Footer = () => {
             </svg>
           </div>
 
-          {/* Right */}
           <div
             className="absolute inset-y-0 right-0 my-[-5rem] w-px"
             style={{
@@ -156,7 +153,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Footer Sections */}
         {Object.entries(sections).map(([key, section]) => (
           <div key={key} className="mt-10 min-w-44 pl-2 lg:mt-0 lg:pl-0">
             <h3 className="mb-4 font-medium text-gray-900 sm:text-sm">

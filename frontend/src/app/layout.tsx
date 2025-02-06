@@ -1,10 +1,7 @@
 import { GeistSans } from "geist/font/sans"
 import type { Metadata } from "next"
 import "./globals.css"
-
-import Footer from "@/components/ui/footer"
 import { siteConfig } from "./siteConfig"
-import { ThemeProvider } from "@/providers/theme-provider"
 import ContextProvider from "@/providers/context"
 import { cookieToInitialState } from "wagmi"
 import { wagmiAdapter } from "@/config"
@@ -17,11 +14,11 @@ export const metadata: Metadata = {
   keywords: ["AI Agents", "Flow", "No-Code Tool"],
   authors: [
     {
-      name: "yourname",
+      name: "Sarthak",
       url: "",
     },
   ],
-  creator: "yourname",
+  creator: "Sarthak",
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -34,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
-    creator: "@yourname",
+    creator: "@0xSarthak13",
   },
   icons: {
     icon: "/favicon.ico",
@@ -54,13 +51,10 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${GeistSans.className} min-h-screen overflow-x-hidden scroll-auto bg-gray-50 antialiased selection:bg-orange-100 selection:text-orange-600`}
+        className={`${GeistSans.className} relative min-h-screen overflow-x-hidden scroll-auto bg-gray-50 antialiased selection:bg-orange-100 selection:text-orange-600`}
       >
         <ContextProvider initialState={initialState}>
-          <ThemeProvider attribute="class" defaultTheme="dark">
-            {children}
-            <Footer />
-          </ThemeProvider>
+          <main className="pb-32">{children}</main>
         </ContextProvider>
       </body>
     </html>

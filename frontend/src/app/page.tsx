@@ -3,7 +3,7 @@ import Features from "@/components/ui/features"
 import { Hero } from "@/components/ui/hero"
 import { AgentAnalytics } from "@/components/ui/agent-analytics"
 import { NavBar } from "@/components/headers/navbar"
-
+import Footer from "@/components/ui/footer"
 export default function Home() {
   return (
     <main className="relative mx-auto flex flex-col">
@@ -18,6 +18,7 @@ export default function Home() {
       <div className="mt-12 mb-40 px-4 xl:px-0">
         <AgentAnalytics />
       </div>
+      <Footer />
     </main>
   )
 }
