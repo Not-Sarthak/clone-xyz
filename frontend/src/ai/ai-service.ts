@@ -5,7 +5,6 @@ import { createRun } from './openai/create-run';
 import { performRun } from './openai/perform-run';
 import { Thread } from 'openai/resources/beta/threads/threads';
 import { Assistant } from 'openai/resources/beta/assistants';
-import { Text } from 'openai/resources/beta/threads/messages';
 
 interface ChatResponse {
   assistantId: string;
@@ -20,11 +19,17 @@ class ChatService {
   private client: OpenAI;
   private assistant: Assistant | null = null;
   private threads: Map<string, Thread> = new Map();
+  private latestResponse: ChatResponse | null = null;  
 
   constructor() {
     this.client = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
+  }
+
+  // Add this new method
+  async getLatestResponse(): Promise<ChatResponse | null> {
+    return this.latestResponse;
   }
 
   async getOrCreateAssistant() {
@@ -57,15 +62,17 @@ class ChatService {
       const runResponse = await performRun(runResult.run, this.client, thread);
 
       if ('text' in runResponse) {
-        const textResponse = runResponse.text as Text;
-        return {
+        const response = {
           assistantId: runResult.assistantId,
           threadId: runResult.threadId,
           text: {
-            value: textResponse.value,
-            annotations: textResponse.annotations || []
+            value: runResponse.text.value,
+            annotations: runResponse.text.annotations || []
           }
         };
+        
+        this.latestResponse = response;  // Store the latest response
+        return response;
       }
 
       throw new Error('Unexpected response format');
