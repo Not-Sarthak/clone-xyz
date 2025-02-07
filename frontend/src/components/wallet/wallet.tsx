@@ -157,7 +157,7 @@ const WalletComponent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-orange-50">
+    <div className="w-full bg-orange-50">
       <div className="mx-auto max-w-lg px-4 py-4 sm:px-6 sm:py-6">
         <div className="flex items-center justify-center">
           <div className="h-1 w-10 rounded-full bg-orange-200" />

@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import { chatService } from '@/ai/ai-service';
 
+interface ChatResponse {
+  assistantId: string;
+  threadId: string;
+  text: {
+    value: string;
+    annotations: never[];
+  };
+}
+
 export async function POST(req: Request) {
   try {
     const { message, threadId } = await req.json();
@@ -10,18 +19,16 @@ export async function POST(req: Request) {
     const result = await chatService.processMessage(
       threadId,
       message,
-    );
+    ) as ChatResponse;
 
     console.log('Chat API result:', result);
 
-    if ('text' in result) {
-      return NextResponse.json({ content: result.text.value });
-    }
+    return NextResponse.json({
+      assistantId: result.assistantId,
+      threadId: result.threadId,
+      content: result.text.value
+    });
 
-    return NextResponse.json(
-      { error: 'Unable to process message' },
-      { status: 500 }
-    );
   } catch (error) {
     console.error('Chat API error:', error);
     return NextResponse.json(

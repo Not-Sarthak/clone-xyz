@@ -54,7 +54,7 @@ export default async function RootLayout({
         className={`${GeistSans.className} relative min-h-screen overflow-x-hidden scroll-auto bg-gray-50 antialiased selection:bg-orange-100 selection:text-orange-600`}
       >
         <ContextProvider initialState={initialState}>
-          <main className="pb-32">{children}</main>
+          <main className="">{children}</main>
         </ContextProvider>
       </body>
     </html>

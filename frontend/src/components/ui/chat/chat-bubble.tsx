@@ -81,13 +81,12 @@ const ChatBubbleAvatar: React.FC<ChatBubbleAvatarProps> = ({
   </Avatar>
 );
 
-// ChatBubbleMessage
-const chatBubbleMessageVariants = cva("p-4", {
+const chatBubbleMessageVariants = cva("py-2.5 px-4", {
   variants: {
     variant: {
       received:
-        "bg-secondary text-secondary-foreground rounded-r-lg rounded-tl-lg",
-      sent: "bg-primary text-primary-foreground rounded-l-lg rounded-tr-lg",
+        "bg-[#1a1a1a] text-[#ffffff] rounded-2xl rounded-bl-sm",
+      sent: "bg-[#f97316] text-[#ffffff] rounded-2xl rounded-br-sm",
     },
     layout: {
       default: "",
@@ -145,7 +144,7 @@ const ChatBubbleTimestamp: React.FC<ChatBubbleTimestampProps> = ({
   className,
   ...props
 }) => (
-  <div className={cx("text-xs mt-2 text-right", className)} {...props}>
+  <div className={cx("text-xs text-right", className)} {...props}>
     {timestamp}
   </div>
 );

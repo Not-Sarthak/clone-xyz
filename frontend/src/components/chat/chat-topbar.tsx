@@ -1,55 +1,16 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
+import React, { useState, useRef } from "react"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Sidebar } from "../sidebar"
 import { Message } from "ai/react"
-import useChatStore from "@/lib/hooks/use-chat-store"
-import { useAppKitAccount } from "@reown/appkit/react"
-import { toast } from "sonner"
-import { ethers, Wallet } from "ethers"
-import WalletDisplay from "./wallet-display"
-import WalletActions from "./wallet-actions"
-import { CaretSortIcon, HamburgerMenuIcon } from "@radix-ui/react-icons"
-import { CheckIcon, CopyIcon, Loader2 } from "lucide-react"
-
-type NetworkConfig = {
-  rpcUrl: string | undefined
-  scanApiUrl: string
-  scanApiKey: string | undefined
-  nativeSymbol: string
-  chainId: number
-}
-
-const NETWORKS: Record<string, NetworkConfig> = {
-  sepolia: {
-    rpcUrl: process.env.ETH_SEPOLIA_RPC,
-    scanApiUrl: "https://api-sepolia.etherscan.io/api",
-    scanApiKey: process.env.NEXT_PUBLIC_ETHSCAN,
-    nativeSymbol: "SepoliaETH",
-    chainId: 11155111,
-  },
-  "base-sepolia": {
-    rpcUrl: process.env.BASE_SEPOLIA_RPC,
-    scanApiUrl: "https://api-sepolia.basescan.org/api",
-    scanApiKey: process.env.NEXT_PUBLIC_BASESCAN,
-    nativeSymbol: "ETH",
-    chainId: 84532,
-  },
-} as const
+import { HamburgerMenuIcon } from "@radix-ui/react-icons"
+import { Wallet, X } from "lucide-react"
+import WalletComponent from "../wallet/wallet"
+import { motion, AnimatePresence, PanInfo } from "framer-motion"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 interface ChatTopbarProps {
   isLoading: boolean
@@ -58,149 +19,23 @@ interface ChatTopbarProps {
   setMessages: (messages: Message[]) => void
 }
 
-interface WalletDetails {
-  publicKey: string
-  privateKey: string
-  seedPhrase: string
-  createdAt: string
-}
+type Tab = "templates" | "voice"
 
-const truncateAddress = (address: string) => {
-  if (!address) return ""
-  return `${address.slice(0, 4)}...${address.slice(-4)}`
-}
-
-export default function ChatTopbar({
-  isLoading,
-  chatId,
-  messages,
-  setMessages,
-}: ChatTopbarProps) {
-  const [open, setOpen] = useState(false)
+export default function ChatTopbar({ chatId, messages }: ChatTopbarProps) {
+  const pathname = usePathname()
   const [sheetOpen, setSheetOpen] = useState(false)
   const [walletSheetOpen, setWalletSheetOpen] = useState(false)
-  const [walletDetails, setWalletDetails] = useState<WalletDetails | null>(null)
-  const [isLoadingWallet, setIsLoadingWallet] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  // const [showPrivateKey, setShowPrivateKey] = useState(false);
-  // const [showSeedPhrase, setShowSeedPhrase] = useState(false);
-  const [copiedStates, setCopiedStates] = useState({
-    publicKey: false,
-    privateKey: false,
-    seedPhrase: false,
-  })
+  const dragConstraintsRef = useRef(null)
 
-  const { address, isConnected } = useAppKitAccount()
-
-  const generateWallet = () => {
-    const wallet = Wallet.createRandom()
-    return {
-      publicKey: wallet.address,
-      privateKey: wallet.privateKey,
-      seedPhrase: wallet.mnemonic?.phrase || "",
-    }
-  }
-
-  const checkAndCreateWallet = async () => {
-    setIsLoadingWallet(true)
-    setError(null)
-
-    try {
-      // First try to fetch existing wallet
-      const response = await fetch(`/api/wallet/${address}`)
-
-      if (response.status === 404) {
-        // Wallet not found, generate and create new one
-        const newWallet = generateWallet()
-
-        const createResponse = await fetch("/api/wallet", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userAddress: address,
-            ...newWallet,
-          }),
-        })
-
-        if (!createResponse.ok) {
-          throw new Error("Failed to create wallet")
-        }
-
-        toast.success("New wallet generated successfully!")
-        // After creating, fetch the wallet details
-        await fetchWalletDetails()
-      } else if (response.ok) {
-        const data = await response.json()
-        setWalletDetails(data)
-      } else {
-        throw new Error("Failed to fetch wallet details")
-      }
-    } catch (error) {
-      console.error("Wallet operation error:", error)
-      setError("Failed to setup wallet. Please try again.")
-      toast.error("Failed to setup wallet")
-    } finally {
-      setIsLoadingWallet(false)
-    }
-  }
-
-  const fetchWalletDetails = async () => {
-    try {
-      const response = await fetch(`/api/wallet/${address}`)
-      if (!response.ok) throw new Error("Failed to fetch wallet details")
-      const data = await response.json()
-      setWalletDetails(data)
-    } catch (error) {
-      console.error("Error fetching wallet:", error)
-      setError("Failed to fetch wallet details")
-    }
-  }
-
-  useEffect(() => {
-    if (address && isConnected) {
-      checkAndCreateWallet()
-    }
-  }, [address, isConnected])
-
-  const handleCopy = async (text: string, field: keyof typeof copiedStates) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopiedStates((prev) => ({ ...prev, [field]: true }))
-      setTimeout(
-        () => setCopiedStates((prev) => ({ ...prev, [field]: false })),
-        2000,
-      )
-      toast.success("Copied to clipboard")
-    } catch {
-      toast.error("Failed to copy")
-    }
-  }
-
-  const handleSendTransaction = async (to: string, amount: string) => {
-    try {
-      const wallet = new ethers.Wallet(
-        walletDetails?.privateKey || "",
-      )
-
-      const tx = await wallet.sendTransaction({
-        to,
-        value: ethers.utils.parseEther(amount),
-      })
-
-      await tx.wait()
-      toast.success("Transaction sent successfully!")
-      return tx
-    } catch (error) {
-      console.error("Transaction error:", error)
-      toast.error("Transaction failed")
-      throw error
+  //@ts-ignore
+  const handleDragEnd = (event: any, info: PanInfo) => {
+    if (info.offset.y > 100) {
+      setWalletSheetOpen(false)
     }
   }
 
   return (
-    <div className="flex w-full items-center justify-between space-x-4 px-4 py-6 lg:justify-center">
+    <div className="flex w-full items-center justify-between space-x-4 px-4 py-6">
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetTrigger>
           <HamburgerMenuIcon className="h-5 w-5 lg:hidden" />
@@ -216,80 +51,94 @@ export default function ChatTopbar({
         </SheetContent>
       </Sheet>
 
-      {isConnected ? (
-        <>
-          <Sheet open={walletSheetOpen} onOpenChange={setWalletSheetOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline">
-                {walletDetails
-                  ? truncateAddress(walletDetails.publicKey)
-                  : "Loading..."}
-              </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle>Wallet Details</SheetTitle>
-              </SheetHeader>
+      <div className="flex flex-1 justify-center space-x-2">
+        <Link href="/templates" className="group">
+          <Button
+            variant="ghost"
+            className={`relative ${
+              pathname === '/templates' 
+                ? 'text-orange-500' 
+                : 'hover:text-orange-500'
+            }`}
+          >
+            Templates
+            <span className={`absolute -bottom-1 left-0 h-0.5 w-full transform bg-orange-500 transition-all duration-200 ${
+              pathname === '/templates' 
+                ? 'scale-x-100' 
+                : 'scale-x-0 group-hover:scale-x-100'
+            }`} />
+          </Button>
+        </Link>
+        <Link href="/voice" className="group">
+          <Button
+            variant="ghost"
+            className={`relative ${
+              pathname === '/voice' 
+                ? 'text-orange-500' 
+                : 'hover:text-orange-500'
+            }`}
+          >
+            Profile
+            <span className={`absolute -bottom-1 left-0 h-0.5 w-full transform bg-orange-500 transition-all duration-200 ${
+              pathname === '/profile' 
+                ? 'scale-x-100' 
+                : "scale-x-0 group-hover:scale-x-100"
+            }`}
+          />
+        </Button>
+      </Link>
+      </div>
 
-              {isLoadingWallet ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="text-primary h-8 w-8 animate-spin" />
-                </div>
-              ) : error ? (
-                <div className="rounded-lg bg-red-50 p-4">
-                  <p className="text-center text-red-600">{error}</p>
-                </div>
-              ) : walletDetails ? (
-                <div className="mt-4 space-y-4">
-                  {/* Public Key */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Public Key</label>
-                    <div className="flex gap-2">
-                      <Input
-                        readOnly
-                        value={walletDetails.publicKey}
-                        className="font-mono text-sm"
-                      />
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() =>
-                          handleCopy(walletDetails.publicKey, "publicKey")
-                        }
-                      >
-                        {copiedStates.publicKey ? (
-                          <CheckIcon className="h-4 w-4" />
-                        ) : (
-                          <CopyIcon className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
+      <Sheet open={walletSheetOpen} onOpenChange={setWalletSheetOpen}>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="hover:bg-orange-50 hover:scale-105 transition-all duration-200">
+            <Wallet className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <AnimatePresence>
+          {walletSheetOpen && (
+            <>
+              <motion.div
+                className="fixed inset-0 z-50 bg-black/80"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                onClick={() => setWalletSheetOpen(false)}
+              />
+              <motion.div
+                ref={dragConstraintsRef}
+                className="fixed inset-x-0 bottom-0 z-50 mt-24 h-[96%] overflow-hidden rounded-t-[10px] bg-orange-50"
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{
+                  type: "spring",
+                  damping: 25,
+                  stiffness: 200,
+                }}
+                drag="y"
+                dragConstraints={{ top: 0, bottom: 0 }}
+                dragElastic={0.2}
+                onDragEnd={handleDragEnd}
+                dragMomentum={false}
+              >
+                <div className="relative h-full">
+                  <button
+                    onClick={() => setWalletSheetOpen(false)}
+                    className="absolute top-4 right-4 z-50 rounded-full p-2 text-gray-500 hover:bg-gray-100"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
+                  <div className="">
+                    <WalletComponent />
                   </div>
-
-                  <div className="text-muted-foreground text-sm">
-                    Created:{" "}
-                    {new Date(walletDetails.createdAt).toLocaleDateString()}
-                  </div>
-
-                  <WalletActions
-                    address={walletDetails.publicKey}
-                    onSend={handleSendTransaction}
-                  />
-                  <WalletDisplay address={walletDetails.publicKey} />
                 </div>
-              ) : (
-                <div className="py-8 text-center">
-                  <p className="text-gray-500">
-                    Please connect your wallet to view details
-                  </p>
-                </div>
-              )}
-            </SheetContent>
-          </Sheet>
-        </>
-      ) : (
-        <></>
-      )}
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </Sheet>
     </div>
   )
 }

@@ -2,7 +2,11 @@ import OpenAI from "openai";
 import { Run } from "openai/resources/beta/threads/runs/runs";
 import { Thread } from "openai/resources/beta/threads/threads";
 
-export async function createRun(client: OpenAI, thread: Thread, assistantId: string): Promise<Run> {
+export async function createRun(client: OpenAI, thread: Thread, assistantId: string): Promise<{
+  run: Run;
+  assistantId: string;
+  threadId: string;
+}> {
     console.log(`Creating run with assistant ${assistantId} for thread ${thread.id}`);
     
     let run = await client.beta.threads.runs.create(thread.id, {
@@ -15,5 +19,9 @@ export async function createRun(client: OpenAI, thread: Thread, assistantId: str
         run = await client.beta.threads.runs.retrieve(thread.id, run.id);
     }
 
-    return run;
+    return {
+        run,
+        assistantId,
+        threadId: thread.id
+    };
 }

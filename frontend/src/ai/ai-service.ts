@@ -5,6 +5,16 @@ import { createRun } from './openai/create-run';
 import { performRun } from './openai/perform-run';
 import { Thread } from 'openai/resources/beta/threads/threads';
 import { Assistant } from 'openai/resources/beta/assistants';
+import { Text } from 'openai/resources/beta/threads/messages';
+
+interface ChatResponse {
+  assistantId: string;
+  threadId: string;
+  text: {
+    value: string;
+    annotations: any[];
+  };
+}
 
 class ChatService {
   private client: OpenAI;
@@ -33,7 +43,7 @@ class ChatService {
     return thread;
   }
 
-  async processMessage(threadId: string, message: string) {
+  async processMessage(threadId: string, message: string): Promise<ChatResponse> {
     try {
       const assistant = await this.getOrCreateAssistant();
       const thread = await this.getOrCreateThread(threadId);
@@ -43,8 +53,22 @@ class ChatService {
         content: message
       });
 
-      const run = await createRun(this.client, thread, assistant.id);
-      return await performRun(run, this.client, thread);
+      const runResult = await createRun(this.client, thread, assistant.id);
+      const runResponse = await performRun(runResult.run, this.client, thread);
+
+      if ('text' in runResponse) {
+        const textResponse = runResponse.text as Text;
+        return {
+          assistantId: runResult.assistantId,
+          threadId: runResult.threadId,
+          text: {
+            value: textResponse.value,
+            annotations: textResponse.annotations || []
+          }
+        };
+      }
+
+      throw new Error('Unexpected response format');
     } catch (error) {
       console.error('Chat service error:', error);
       throw error;
