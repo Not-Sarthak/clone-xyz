@@ -17,13 +17,20 @@ router.post("/execute", async (req, res) => {
     console.log(`assignmentId: ${assignmentId}`);
 
     try {
-
-        const result = {
+        const data = {
             threadId: threadId,
             assignmentId: assignmentId
         }
-        const [cid, poll] = await dalService.publishToEigenDA(result);
-        res.status(200).send(new CustomResponse({ proofOfTask: cid, data: data, taskDefinitionId: taskDefinitionId }, "Blob dispersion started. Task will be submitted after blob is dispersed."));
+        const [cid, poll] = await dalService.publishToEigenDA(data);
+        res.status(200).send(new CustomResponse(
+            {
+                proofOfTask: cid,
+                data: data,
+                taskDefinitionId: taskDefinitionId
+            },
+            "Blob dispersion started. Task will be submitted after blob is dispersed."
+        ));
+
         const blob = await poll;
         console.log(`blob data: ${blob}`);
         await dalService.sendTask(cid, data, taskDefinitionId);
