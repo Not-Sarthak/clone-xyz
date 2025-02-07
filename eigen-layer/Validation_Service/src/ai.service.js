@@ -5,14 +5,12 @@ async function handleChatResponse(response) {
     try {
         console.log('Validation Service received response:', {
             assistantId: response.assistantId,
-            threadId: response.threadId,
-            content: response.content
+            threadId: response.threadId
         });
 
         return {
             assistantId: response.assistantId,
-            threadId: response.threadId,
-            content: response.content
+            threadId: response.threadId
         };
     } catch (err) {
         console.error('Error in Validation Service:', err.message);
