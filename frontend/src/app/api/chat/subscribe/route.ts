@@ -7,7 +7,7 @@ export async function POST() {
     
     if (!result) {
       return NextResponse.json(
-        { error: 'No chat response available' },
+        { error: 'No chat response available yet' },
         { status: 404 }
       );
     }
