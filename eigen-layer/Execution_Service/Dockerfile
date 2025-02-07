@@ -15,5 +15,8 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-EXPOSE 8080
+ENV PORT=4003
+ENV HOST=0.0.0.0
+
+EXPOSE ${PORT}
 CMD [ "node", "index.js" ]

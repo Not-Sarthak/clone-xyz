@@ -3,13 +3,16 @@ const env = require("dotenv")
 env.config()
 const express = require("express")
 const app = express()
-const path = require("path")
-const taskController = require("../src/task.controller")
 const cors = require('cors')
 
+// Configure CORS for all domains
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}))
 
 app.use(express.json())
-app.use(cors())
-app.use("/task", taskController)
+app.use("/task", require("../src/task.controller"))
 
 module.exports = app
