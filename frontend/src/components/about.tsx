@@ -18,22 +18,6 @@ const actions: ActionExample[] = [
     description: "Perform actions using ThirdWeb Nebula API",
     examples: ["Deploy an ERC20 Token", "USDC Contract Address on Ethereum"],
   },
-  {
-    title: "Bridge Tokens",
-    description: "Transfer tokens between different networks",
-    examples: [
-      "Bridge 0.1 ETH from Sepolia to Base",
-      "Bridge 100 USDC from Base to Sepolia",
-    ],
-  },
-  {
-    title: "Lending Operations",
-    description: "Deposit and supply assets to Aave V3",
-    examples: [
-      "Deposit 0.1 ETH to Aave on Sepolia",
-      "Supply 100 USDC to Aave on Base",
-    ],
-  },
 ];
 
 export default function About() {
@@ -54,7 +38,7 @@ export default function About() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-white">
       <div className="space-y-4">
         {actions.map((action, index) => (
           <Card key={index} className="p-4 space-y-3">

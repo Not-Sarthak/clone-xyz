@@ -1,6 +1,6 @@
 export const siteConfig = {
-  name: "BotSwarm",
-  url: "https://botswarm.example",
+  name: "Clone",
+  url: "https://clone.com",
   description: "Build, deploy, and mint custom agents for your degen space.",
   baseLinks: {
     home: "/",

@@ -160,7 +160,6 @@ export default function WalletDisplay({ address }: { address: string }) {
       const provider = new ethers.providers.JsonRpcProvider(networkConfig.rpcUrl);
       const formattedAddress = ethers.utils.getAddress(address);
 
-      // Get native token balance
       const balance = await provider.getBalance(formattedAddress);
       const balanceInEther = ethers.utils.formatEther(balance);
 
@@ -191,7 +190,7 @@ export default function WalletDisplay({ address }: { address: string }) {
           const formattedBalance = ethers.utils.formatUnits(balance, decimals);
           
           if (parseFloat(formattedBalance) > 0) {
-            const metadata = await fetchTokenMetadata(tokenAddress, selectedNetwork);
+            // const metadata = await fetchTokenMetadata(tokenAddress, selectedNetwork);
             tokensList.push({
               symbol,
               name,
@@ -230,7 +229,7 @@ export default function WalletDisplay({ address }: { address: string }) {
   if (error) {
     return (
       <div className="p-4">
-        <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg">
+        <div className="bg-red-500/10 text-red-500 px-4 py-3 rounded-lg">
           <p className="text-sm">{error}</p>
         </div>
         <Button 

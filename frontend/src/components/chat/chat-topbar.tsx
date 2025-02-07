@@ -90,16 +90,7 @@ export default function ChatTopbar({
     seedPhrase: false,
   })
 
-  const selectedNetwork = useChatStore((state) => state.selectedNetwork)
-  const setSelectedNetwork = useChatStore((state) => state.setSelectedNetwork)
-
   const { address, isConnected } = useAppKitAccount()
-  const networks = ["Sepolia", "Base Sepolia"]
-
-  const handleNetworkChange = (network: string) => {
-    setSelectedNetwork(network)
-    setOpen(false)
-  }
 
   const generateWallet = () => {
     const wallet = Wallet.createRandom()
@@ -189,14 +180,8 @@ export default function ChatTopbar({
 
   const handleSendTransaction = async (to: string, amount: string) => {
     try {
-      const networkKey =
-        selectedNetwork?.toLowerCase().replace(" ", "-") || "sepolia"
-      const provider = new ethers.providers.JsonRpcProvider(
-        NETWORKS[networkKey].rpcUrl,
-      )
       const wallet = new ethers.Wallet(
         walletDetails?.privateKey || "",
-        provider,
       )
 
       const tx = await wallet.sendTransaction({
@@ -230,34 +215,6 @@ export default function ChatTopbar({
           />
         </SheetContent>
       </Sheet>
-
-      {/* Network Selector */}
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            disabled={isLoading}
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-[200px] justify-between capitalize"
-          >
-            {selectedNetwork || "Select Network"}
-            <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
-          {networks.map((network) => (
-            <Button
-              key={network}
-              variant="ghost"
-              className="w-full justify-start font-normal capitalize"
-              onClick={() => handleNetworkChange(network)}
-            >
-              {network}
-            </Button>
-          ))}
-        </PopoverContent>
-      </Popover>
 
       {isConnected ? (
         <>
@@ -331,7 +288,7 @@ export default function ChatTopbar({
           </Sheet>
         </>
       ) : (
-        <appkit-button />
+        <></>
       )}
     </div>
   )

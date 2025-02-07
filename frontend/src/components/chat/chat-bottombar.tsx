@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect } from "react";
 import { Button } from "../ui/button";
 import { AnimatePresence } from "framer-motion";
@@ -6,8 +8,8 @@ import useChatStore from "@/lib/hooks/use-chat-store";
 import Image from "next/image";
 import { ChatRequestOptions } from "ai";
 import { ChatInput } from "../ui/chat/chat-input";
-import { useAccount } from "wagmi";
-import { RiWalletLine, RiStopCircleLine, RiSendPlaneLine, RiCloseCircleLine } from "@remixicon/react";
+import { RiStopCircleLine, RiSendPlaneLine, RiCloseCircleLine } from "@remixicon/react";
+
 interface ChatBottombarProps {
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleSubmit: (
@@ -30,14 +32,24 @@ export default function ChatBottombar({
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const base64Images = useChatStore((state) => state.base64Images);
   const setBase64Images = useChatStore((state) => state.setBase64Images);
-  const selectedNetwork = useChatStore((state) => state.selectedNetwork);
-  const { isConnected } = useAccount();
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+      const formEvent = e as unknown as React.FormEvent<HTMLFormElement>;
+      handleFormSubmit(formEvent);
     }
+  };
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const options: ChatRequestOptions = {
+      data: {
+        images: base64Images || []
+      }
+    };
+    handleSubmit(e, options);
+    setBase64Images(null);
   };
 
   useEffect(() => {
@@ -46,25 +58,12 @@ export default function ChatBottombar({
     }
   }, [inputRef]);
 
-  if (!isConnected) {
-    return (
-      <div className="px-4 pb-7 flex justify-between w-full items-center relative">
-        <div className="w-full items-center flex flex-col bg-accent dark:bg-card rounded-lg p-4">
-          <div className="flex items-center justify-center gap-2 text-muted-foreground">
-            <RiWalletLine className="w-4 h-4" />
-            <span className="text-sm">Please connect your wallet to continue</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="px-4 pb-7 flex justify-between w-full items-center relative">
       <AnimatePresence initial={false}>
         <form
-          onSubmit={handleSubmit}
-          className="w-full items-center flex flex-col bg-accent dark:bg-card rounded-lg"
+          onSubmit={handleFormSubmit}
+          className="w-full items-center flex flex-col bg-[#f4f4f4] dark:bg-card rounded-lg"
         >
           <ChatInput
             value={input}
@@ -73,7 +72,7 @@ export default function ChatBottombar({
             onChange={handleInputChange}
             name="message"
             placeholder="Enter your prompt here"
-            className="max-h-40 px-6 pt-6 border-0 shadow-none bg-accent rounded-lg text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed dark:bg-card"
+            className="max-h-40 px-6 pt-6 border-0 shadow-none bg-[#f4f4f4] rounded-lg text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed dark:bg-card"
           />
 
           <div className="flex w-full items-center p-2">
@@ -85,11 +84,8 @@ export default function ChatBottombar({
                     className="shrink-0 rounded-full"
                     variant="ghost"
                     size="icon"
-                    type="submit"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      stop();
-                    }}
+                    type="button"
+                    onClick={stop}
                   >
                     <RiStopCircleLine className="w-5 h-5" />
                   </Button>
@@ -103,11 +99,11 @@ export default function ChatBottombar({
                 />
                 <div>
                   <Button
-                    className="shrink-0 rounded-full"
+                    className="shrink-0 cursor-pointer bg-[#f4f4f4] hover:scale-95 hover:bg-[#f4f4f4]/50 transition-all duration-200 rounded-full"
                     variant="ghost"
                     size="icon"
                     type="submit"
-                    disabled={isLoading || !input.trim() || !selectedNetwork}
+                    disabled={isLoading || !input.trim()}
                   >
                     <RiSendPlaneLine className="w-5 h-5" />
                   </Button>
@@ -115,7 +111,7 @@ export default function ChatBottombar({
               </div>
             )}
           </div>
-          {base64Images && (
+          {base64Images && base64Images.length > 0 && (
             <div className="w-full flex px-2 pb-2 gap-2">
               {base64Images.map((image, index) => (
                 <div
@@ -133,9 +129,8 @@ export default function ChatBottombar({
                   </div>
                   <Button
                     onClick={() => {
-                      const updatedImages = (prevImages: string[]) =>
-                        prevImages.filter((_, i) => i !== index);
-                      setBase64Images(updatedImages(base64Images));
+                      const updatedImages = base64Images.filter((_, i) => i !== index);
+                      setBase64Images(updatedImages.length > 0 ? updatedImages : null);
                     }}
                     size="icon"
                     className="absolute -top-1.5 -right-1.5 text-white cursor-pointer bg-red-500 hover:bg-red-600 w-4 h-4 rounded-full flex items-center justify-center"

@@ -39,6 +39,9 @@ export default function EditUsernameForm({ setOpen }: EditUsernameFormProps) {
   const userName = useChatStore((state) => state.userName);
   const setUserName = useChatStore((state) => state.setUserName);
   const accountDetails = useAppKitAccount();
+  // const accountDetails = {
+  //   address: "0x1234567890123456789012345678901234567890",
+  // };
   
   const [walletDetails, setWalletDetails] = useState<WalletDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,7 +128,7 @@ export default function EditUsernameForm({ setOpen }: EditUsernameFormProps) {
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         ) : error ? (
-          <div className="text-destructive py-2">{error}</div>
+          <div className="text-red-500 py-2">{error}</div>
         ) : walletDetails ? (
           <div className="space-y-4">
             <div className="space-y-2">
@@ -134,12 +137,13 @@ export default function EditUsernameForm({ setOpen }: EditUsernameFormProps) {
                 <Input
                   readOnly
                   value={walletDetails.publicKey}
-                  className="font-mono text-sm"
+                  className="font-mono text-sm cursor-text"
                 />
                 <Button
                   size="icon"
                   variant="outline"
                   onClick={() => handleCopy(walletDetails.publicKey, 'publicKey')}
+                  className="cursor-pointer"
                 >
                   {copiedStates.publicKey ? (
                     <CheckIcon className="h-4 w-4" />
@@ -157,6 +161,7 @@ export default function EditUsernameForm({ setOpen }: EditUsernameFormProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowPrivateKey(!showPrivateKey)}
+                  className="cursor-pointer"
                 >
                   {showPrivateKey ? (
                     <EyeOff className="h-4 w-4" />
@@ -170,12 +175,13 @@ export default function EditUsernameForm({ setOpen }: EditUsernameFormProps) {
                   type={showPrivateKey ? "text" : "password"}
                   readOnly
                   value={walletDetails.privateKey}
-                  className="font-mono text-sm"
+                  className="font-mono text-sm cursor-text"
                 />
                 <Button
                   size="icon"
                   variant="outline"
                   onClick={() => handleCopy(walletDetails.privateKey, 'privateKey')}
+                  className="cursor-pointer"
                 >
                   {copiedStates.privateKey ? (
                     <CheckIcon className="h-4 w-4" />
@@ -193,6 +199,7 @@ export default function EditUsernameForm({ setOpen }: EditUsernameFormProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowSeedPhrase(!showSeedPhrase)}
+                  className="cursor-pointer"
                 >
                   {showSeedPhrase ? (
                     <EyeOff className="h-4 w-4" />
@@ -206,12 +213,13 @@ export default function EditUsernameForm({ setOpen }: EditUsernameFormProps) {
                   type={showSeedPhrase ? "text" : "password"}
                   readOnly
                   value={walletDetails.seedPhrase}
-                  className="font-mono text-sm"
+                  className="font-mono text-sm cursor-text"
                 />
                 <Button
                   size="icon"
                   variant="outline"
                   onClick={() => handleCopy(walletDetails.seedPhrase, 'seedPhrase')}
+                  className="cursor-pointer"
                 >
                   {copiedStates.seedPhrase ? (
                     <CheckIcon className="h-4 w-4" />
@@ -231,7 +239,9 @@ export default function EditUsernameForm({ setOpen }: EditUsernameFormProps) {
 
       <div className="w-full flex flex-col gap-4 pt-4">
         <FormLabel>Theme</FormLabel>
-        <ModeToggle />
+        <div className="cursor-pointer">
+          <ModeToggle />
+        </div>
       </div>
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -243,8 +253,8 @@ export default function EditUsernameForm({ setOpen }: EditUsernameFormProps) {
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <div className="md:flex gap-4">
-                  <Input {...field} type="text" placeholder="Enter your name" />
-                  <Button type="submit">Change name</Button>
+                  <Input {...field} type="text" placeholder="Enter your name" className="cursor-text" />
+                  <Button type="submit" className="cursor-pointer">Change name</Button>
                 </div>
               </FormControl>
               <FormMessage />

@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from "react";
 import { Message } from "ai";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import ChatTopbar from "./chat-topbar";
 import ChatList from "./chat-list";
@@ -25,7 +24,6 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
-  const selectedNetwork = useChatStore((state) => state.selectedNetwork);
   const saveMessages = useChatStore((state) => state.saveMessages);
 
   const handleInputChange = useCallback(
@@ -45,11 +43,6 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (!selectedNetwork) {
-      toast.error("Please select a network");
-      return;
-    }
 
     const trimmedInput = input.trim();
     if (!trimmedInput) {
@@ -79,7 +72,6 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
         url: `${window.location.origin}/api/chat`,
         data: {
           message: trimmedInput,
-          selectedNetwork,
         },
         headers: {
           "Content-Type": "application/json",
@@ -168,7 +160,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
                   key={index}
                   variant="outline"
                   size="sm"
-                  className="h-7 px-2 text-xs font-normal border-[#3c444c] hover:bg-accent/50 transition-colors"
+                  className="h-7 cursor-pointer px-2 text-xs font-normal hover:bg-[f4f4f4]/50 transition-colors"
                   onClick={() => handleSuggestionClick(suggestion.text)}
                 >
                   <span className="mr-1.5">{suggestion.icon}</span>

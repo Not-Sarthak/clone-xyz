@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { Assistant } from "openai/resources/beta/assistants";
-import { tools } from "../templates/tools/index";
+import { tools } from "../templates/index";
 import { assistantPrompt } from "../../const/prompt";
 
 export async function createAssistant(client: OpenAI): Promise<Assistant> {

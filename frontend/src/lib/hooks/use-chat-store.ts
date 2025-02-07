@@ -1,39 +1,36 @@
-import { Message } from "ai";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { Message } from "ai"
+import { create } from "zustand"
+import { createJSONStorage, persist } from "zustand/middleware"
 
 interface ChatSession {
-  messages: Message[];
-  createdAt: string;
+  messages: Message[]
+  createdAt: string
 }
 
 interface State {
-  base64Images: string[] | null;
-  chats: Record<string, ChatSession>;
-  currentChatId: string | null;
-  selectedNetwork: string;  
-  userName: string;
+  base64Images: string[] | null
+  chats: Record<string, ChatSession>
+  currentChatId: string | null
+  userName: string
 }
 
 interface Actions {
-  setBase64Images: (base64Images: string[] | null) => void;
-  setMessages: (chatId: string, fn: (messages: Message[]) => Message[]) => void;
-  setCurrentChatId: (chatId: string) => void;
-  setSelectedNetwork: (selectedNetwork: string) => void;
-  getChatById: (chatId: string) => ChatSession | undefined;
-  getMessagesById: (chatId: string) => Message[];
-  saveMessages: (chatId: string, messages: Message[]) => void;
-  handleDelete: (chatId: string, messageId?: string) => void;
-  setUserName: (userName: string) => void;
+  setBase64Images: (base64Images: string[] | null) => void
+  setMessages: (chatId: string, fn: (messages: Message[]) => Message[]) => void
+  setCurrentChatId: (chatId: string) => void
+  getChatById: (chatId: string) => ChatSession | undefined
+  getMessagesById: (chatId: string) => Message[]
+  saveMessages: (chatId: string, messages: Message[]) => void
+  handleDelete: (chatId: string, messageId?: string) => void
+  setUserName: (userName: string) => void
 }
 
 const initialState: State = {
   base64Images: null,
   chats: {},
   currentChatId: null,
-  selectedNetwork: 'Sepolia', // Set default network
-  userName: "Anonymous"
-};
+  userName: "Anonymous",
+}
 
 const useChatStore = create<State & Actions>()(
   persist(
@@ -41,13 +38,13 @@ const useChatStore = create<State & Actions>()(
       ...initialState,
 
       setBase64Images: (base64Images) => set({ base64Images }),
-      
+
       setUserName: (userName) => set({ userName }),
-      
+
       setMessages: (chatId, fn) =>
         set((state) => {
-          const existingChat = state.chats[chatId];
-          const updatedMessages = fn(existingChat?.messages || []);
+          const existingChat = state.chats[chatId]
+          const updatedMessages = fn(existingChat?.messages || [])
 
           return {
             chats: {
@@ -58,30 +55,24 @@ const useChatStore = create<State & Actions>()(
                 createdAt: existingChat?.createdAt || new Date().toISOString(),
               },
             },
-          };
+          }
         }),
 
       setCurrentChatId: (chatId) => set({ currentChatId: chatId }),
-      
-      setSelectedNetwork: (selectedNetwork) => {
-        set((state) => ({
-          selectedNetwork: selectedNetwork || state.selectedNetwork
-        }));
-      },
-      
+
       getChatById: (chatId) => {
-        const state = get();
-        return state.chats[chatId];
+        const state = get()
+        return state.chats[chatId]
       },
-      
+
       getMessagesById: (chatId) => {
-        const state = get();
-        return state.chats[chatId]?.messages || [];
+        const state = get()
+        return state.chats[chatId]?.messages || []
       },
-      
+
       saveMessages: (chatId, messages) => {
         set((state) => {
-          const existingChat = state.chats[chatId];
+          const existingChat = state.chats[chatId]
 
           return {
             chats: {
@@ -91,19 +82,19 @@ const useChatStore = create<State & Actions>()(
                 createdAt: existingChat?.createdAt || new Date().toISOString(),
               },
             },
-          };
-        });
+          }
+        })
       },
-      
+
       handleDelete: (chatId, messageId) => {
         set((state) => {
-          const chat = state.chats[chatId];
-          if (!chat) return state;
+          const chat = state.chats[chatId]
+          if (!chat) return state
 
           if (messageId) {
             const updatedMessages = chat.messages.filter(
-              (message) => message.id !== messageId
-            );
+              (message) => message.id !== messageId,
+            )
             return {
               chats: {
                 ...state.chats,
@@ -112,15 +103,16 @@ const useChatStore = create<State & Actions>()(
                   messages: updatedMessages,
                 },
               },
-            };
+            }
           }
 
-          const { [chatId]: _, ...remainingChats } = state.chats;
+          const { [chatId]: _, ...remainingChats } = state.chats
           return {
             chats: remainingChats,
-            currentChatId: state.currentChatId === chatId ? null : state.currentChatId,
-          };
-        });
+            currentChatId:
+              state.currentChatId === chatId ? null : state.currentChatId,
+          }
+        })
       },
     }),
     {
@@ -129,21 +121,14 @@ const useChatStore = create<State & Actions>()(
       partialize: (state) => ({
         chats: state.chats,
         currentChatId: state.currentChatId,
-        selectedNetwork: state.selectedNetwork,
         userName: state.userName,
       }),
       version: 1,
-      migrate: (persistedState: any, version: number) => {
-        if (version === 0) {
-          return {
-            ...persistedState,
-            selectedNetwork: 'Sepolia'
-          };
-        }
-        return persistedState;
+      migrate: (persistedState: any) => {
+        return persistedState
       },
-    }
-  )
-);
+    },
+  ),
+)
 
-export default useChatStore;
+export default useChatStore

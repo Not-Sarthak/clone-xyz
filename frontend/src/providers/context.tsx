@@ -2,7 +2,6 @@
 
 import React, { type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ThemeProvider } from "next-themes";
 import { createAppKit } from "@reown/appkit/react";
 import {
   wagmiAdapter,
@@ -49,13 +48,7 @@ function ContextProvider({
       initialState={initialState}
     >
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-        >
           {children}
-        </ThemeProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

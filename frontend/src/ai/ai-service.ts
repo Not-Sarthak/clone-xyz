@@ -33,20 +33,18 @@ class ChatService {
     return thread;
   }
 
-  async processMessage(threadId: string, message: string, network: string) {
+  async processMessage(threadId: string, message: string) {
     try {
       const assistant = await this.getOrCreateAssistant();
       const thread = await this.getOrCreateThread(threadId);
-
-      const messageWithContext = `[Network: ${network}] ${message}`;
       
       await this.client.beta.threads.messages.create(thread.id, {
         role: "user",
-        content: messageWithContext
+        content: message
       });
 
       const run = await createRun(this.client, thread, assistant.id);
-      return await performRun(run as any, this.client, thread);
+      return await performRun(run, this.client, thread);
     } catch (error) {
       console.error('Chat service error:', error);
       throw error;

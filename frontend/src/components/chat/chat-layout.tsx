@@ -100,7 +100,7 @@ export function ChatLayout({
             "transition-all duration-300 ease-in-out"
           )}
         >
-          <div className="h-full border-[#3c444c] flex justify-center items-center rounded-lg border border-border/40 shadow-sm">
+          <div className="h-full flex justify-center items-center border-x border-[#f4f4f4] shadow-sm">
             <Chat 
               id={id} 
               initialMessages={initialMessages} 

@@ -3,14 +3,13 @@ import { chatService } from '@/ai/ai-service';
 
 export async function POST(req: Request) {
   try {
-    const { message, selectedNetwork, threadId } = await req.json();
+    const { message, threadId } = await req.json();
 
     console.log('Processing message:', message);
     
     const result = await chatService.processMessage(
       threadId,
       message,
-      selectedNetwork
     );
 
     console.log('Chat API result:', result);
