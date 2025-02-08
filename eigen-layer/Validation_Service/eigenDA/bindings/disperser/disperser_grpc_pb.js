@@ -1,7 +1,7 @@
 // GENERATED CODE -- DO NOT EDIT!
 
 'use strict';
-var grpc = require('grpc');
+var grpc = require('@grpc/grpc-js');
 var disperser_disperser_pb = require('../disperser/disperser_pb.js');
 var common_common_pb = require('../common/common_pb.js');
 
@@ -97,10 +97,10 @@ function deserialize_disperser_RetrieveBlobRequest(buffer_arg) {
 // Disperser defines the public APIs for dispersing blobs.
 var DisperserService = exports.DisperserService = {
   // This API accepts blob to disperse from clients.
-// This executes the dispersal async, i.e. it returns once the request
-// is accepted. The client could use GetBlobStatus() API to poll the the
-// processing status of the blob.
-disperseBlob: {
+  // This executes the dispersal async, i.e. it returns once the request
+  // is accepted. The client could use GetBlobStatus() API to poll the the
+  // processing status of the blob.
+  disperseBlob: {
     path: '/disperser.Disperser/DisperseBlob',
     requestStream: false,
     responseStream: false,
@@ -112,14 +112,14 @@ disperseBlob: {
     responseDeserialize: deserialize_disperser_DisperseBlobReply,
   },
   // DisperseBlobAuthenticated is similar to DisperseBlob, except that it requires the
-// client to authenticate itself via the AuthenticationData message. The protoco is as follows:
-// 1. The client sends a DisperseBlobAuthenticated request with the DisperseBlobRequest message
-// 2. The Disperser sends back a BlobAuthHeader message containing information for the client to
-//    verify and sign.
-// 3. The client verifies the BlobAuthHeader and sends back the signed BlobAuthHeader in an
-// 	  AuthenticationData message.
-// 4. The Disperser verifies the signature and returns a DisperseBlobReply message.
-disperseBlobAuthenticated: {
+  // client to authenticate itself via the AuthenticationData message. The protoco is as follows:
+  // 1. The client sends a DisperseBlobAuthenticated request with the DisperseBlobRequest message
+  // 2. The Disperser sends back a BlobAuthHeader message containing information for the client to
+  //    verify and sign.
+  // 3. The client verifies the BlobAuthHeader and sends back the signed BlobAuthHeader in an
+  // 	  AuthenticationData message.
+  // 4. The Disperser verifies the signature and returns a DisperseBlobReply message.
+  disperseBlobAuthenticated: {
     path: '/disperser.Disperser/DisperseBlobAuthenticated',
     requestStream: true,
     responseStream: true,
@@ -131,7 +131,7 @@ disperseBlobAuthenticated: {
     responseDeserialize: deserialize_disperser_AuthenticatedReply,
   },
   // This API is meant to be polled for the blob status.
-getBlobStatus: {
+  getBlobStatus: {
     path: '/disperser.Disperser/GetBlobStatus',
     requestStream: false,
     responseStream: false,
@@ -143,12 +143,12 @@ getBlobStatus: {
     responseDeserialize: deserialize_disperser_BlobStatusReply,
   },
   // This retrieves the requested blob from the Disperser's backend.
-// This is a more efficient way to retrieve blobs than directly retrieving
-// from the DA Nodes (see detail about this approach in
-// api/proto/retriever/retriever.proto).
-// The blob should have been initially dispersed via this Disperser service
-// for this API to work.
-retrieveBlob: {
+  // This is a more efficient way to retrieve blobs than directly retrieving
+  // from the DA Nodes (see detail about this approach in
+  // api/proto/retriever/retriever.proto).
+  // The blob should have been initially dispersed via this Disperser service
+  // for this API to work.
+  retrieveBlob: {
     path: '/disperser.Disperser/RetrieveBlob',
     requestStream: false,
     responseStream: false,
