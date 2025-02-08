@@ -1,29 +1,29 @@
-import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { WagmiAdapter } from "@reown/appkit-adapter-wagmi"
 import {
   AppKitNetwork,
+  flowMainnet,
+  flowTestnet,
   arbitrum,
-  mainnet,
-  optimism,
-  polygon,
-} from '@reown/appkit/networks'
+  arbitrumSepolia,
+} from "@reown/appkit/networks"
 import {
   type SIWESession,
   type SIWEVerifyMessageArgs,
   type SIWECreateMessageArgs,
   createSIWEConfig,
   formatMessage,
-} from '@reown/appkit-siwe'
-import { getCsrfToken, getSession, signIn, signOut } from 'next-auth/react';
-import { getAddress } from 'viem';
+} from "@reown/appkit-siwe"
+import { getCsrfToken, getSession, signIn, signOut } from "next-auth/react"
+import { getAddress } from "viem"
 
 export const projectId =
   process.env.NEXT_PUBLIC_PROJECT_ID || "b56e18d47c72ab683b10814fe9495694"
 
 export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [
-  mainnet,
-  polygon,
+  flowMainnet,
+  flowTestnet,
   arbitrum,
-  optimism,
+  arbitrumSepolia,
 ]
 
 export const metadata = {
@@ -73,7 +73,7 @@ export const siweConfig = createSIWEConfig({
     return nonce
   },
   getSession: async () => {
-    const session = await getSession();
+    const session = await getSession()
     if (!session) {
       return null
     }

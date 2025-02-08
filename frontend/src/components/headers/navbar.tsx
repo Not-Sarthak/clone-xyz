@@ -1,4 +1,3 @@
-// NavBar.tsx
 "use client";
 
 import { siteConfig } from "@/app/siteConfig";
@@ -66,12 +65,7 @@ export function NavBar() {
             </nav>
 
             <div className="hidden items-center gap-2 lg:flex">
-              <Button
-                onClick={() => setShowAuthModal(true)}
-                className="px-5 py-3 cursor-pointer bg-gradient-to-b from-orange-400 to-orange-500 leading-4 tracking-wide whitespace-nowrap"
-              >
-                Get Started
-              </Button>
+              <appkit-button />
             </div>
 
             <Button
@@ -120,16 +114,9 @@ export function NavBar() {
                     </Link>
                   </li>
                 </ul>
-                <Button 
-                  variant="secondary" 
-                  className="text-lg px-4 py-2"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setShowAuthModal(true);
-                  }}
-                >
-                  Get Started
-                </Button>
+                <div className="flex justify-center">
+                  <appkit-button />
+                </div>
               </motion.nav>
             )}
           </AnimatePresence>
