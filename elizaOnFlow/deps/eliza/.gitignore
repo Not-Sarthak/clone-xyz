@@ -1,6 +1,8 @@
 node_modules
 /out
 
+.github/*
+
 .env
 .env.production
 .env.local
