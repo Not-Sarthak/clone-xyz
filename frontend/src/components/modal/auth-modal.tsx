@@ -1,7 +1,6 @@
 import React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { RiDiscordFill, RiTelegramFill, RiCloseFill } from "@remixicon/react"
-import { Button } from "../buttons/button"
+import { RiCloseFill } from "@remixicon/react"
 
 interface AuthModalProps {
   isOpen: boolean
@@ -56,15 +55,6 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       opacity: 0,
       transition: { duration: 0.2 },
     },
-  }
-
-  const buttonVariants = {
-    hover: {
-      scale: 1.01,
-      backgroundColor: "rgb(249 250 251)",
-      transition: { duration: 0.2 },
-    },
-    tap: { scale: 0.99 },
   }
 
   return (
@@ -122,41 +112,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
               {/* Auth Buttons */}
               <div className="space-y-3">
-                <motion.div
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                >
-                  <Button
-                    onClick={() => {
-                      console.log("Discord")
-                    }}
-                    className="w-full bg-gradient-to-b from-orange-400 to-orange-500"
-                  >
-                    <RiDiscordFill className="size-5 text-[#5865F2]" />
-                    <span className="text-sm font-medium sm:text-base">
-                      Continue with Discord
-                    </span>
-                  </Button>
-                </motion.div>
-
-                <motion.div
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                >
-                  <Button
-                    onClick={() => {
-                      console.log("Telegram")
-                    }}
-                    className="w-full bg-gradient-to-b from-orange-400 to-orange-500"
-                  >
-                    <RiTelegramFill className="size-5 text-[#229ED9]" />
-                    <span className="text-sm font-medium sm:text-base">
-                      Continue with Telegram
-                    </span>
-                  </Button>
-                </motion.div>
+                <span className="flex justify-center text-sm font-medium sm:text-base">
+                  <appkit-button />
+                </span>
               </div>
 
               <motion.p
