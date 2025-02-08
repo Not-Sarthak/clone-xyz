@@ -1,5 +1,5 @@
 require('dotenv').config();
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
 const { DisperserClient } = require('../eigenDA/bindings/disperser/disperser_grpc_pb');
 const { BlobStatusRequest, RetrieveBlobRequest } = require('../eigenDA/bindings/disperser/disperser_pb');
 
@@ -17,13 +17,13 @@ async function getEigenDATask(cid) {
   const statusResponse = await getBlobStatus(client, statusRequest);
   const blobIndex = statusResponse.getInfo()?.getBlobVerificationProof()?.getBlobIndex();
   const batchHeaderHash = statusResponse.getInfo()?.getBlobVerificationProof()?.getBatchMetadata()?.getBatchHeaderHash();
-  
+
   if (!blobIndex || !batchHeaderHash) {
     console.log('Blob dispersal is still in progress. Blob status:');
     console.log(statusResponse.toObject());
     return null;
   }
-  
+
   const retrieveRequest = new RetrieveBlobRequest();
   retrieveRequest.setBlobIndex(blobIndex);
   retrieveRequest.setBatchHeaderHash(batchHeaderHash);
