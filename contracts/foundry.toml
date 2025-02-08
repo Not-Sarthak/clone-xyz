@@ -1,6 +1,6 @@
 [profile.default]
 auto_detect_solc = false
-block_timestamp = 1_680_220_800                                                  # March 31, 2023 at 00:00 GMT
+block_timestamp = 1_680_220_800 # March 31, 2023 at 00:00 GMT
 bytecode_hash = "none"
 evm_version = "paris"
 fuzz = { runs = 1_000 }
@@ -11,7 +11,10 @@ out = "out"
 script = "script"
 test = "test"
 via_ir = true
-fs_permissions = [{ access = "read-write", path = "./broadcast/Deploy.s.sol/" }]
+fs_permissions = [
+    { access = "read-write", path = "./broadcast" },
+    { access = "read-write", path = "./broadcast/Deploy.s.sol" },
+]
 libs = ["lib"]
 
 [profile.ci]

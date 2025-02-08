@@ -65,12 +65,18 @@ contract Deploy is Script {
         vm.stopBroadcast();
 
         string memory chainId = vm.envString("CHAIN_ID");
+        string memory deploymentPath = string.concat("broadcast/Deploy.s.sol/", chainId);
+
+        // Create directory if it doesn't exist
+        vm.createDir(deploymentPath, true);
+
+        // Write the output
         string memory output = "output";
         string memory registryK = "registry";
         string memory factoryK = "orderFactory";
         vm.serializeString(output, registryK, vm.toString(registryAddress));
         string memory out = vm.serializeString(output, factoryK, vm.toString(factoryAddress));
-        string memory path = string.concat("./broadcast/Deploy.s.sol/", chainId, "/latest.json");
+        string memory path = string.concat(deploymentPath, "/run-latest.json");
         vm.writeJson(out, path);
     }
 
