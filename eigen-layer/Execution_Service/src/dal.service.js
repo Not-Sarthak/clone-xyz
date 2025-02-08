@@ -1,16 +1,16 @@
 require('dotenv').config();
 const pinataSDK = require("@pinata/sdk");
 const { ethers } = require('ethers');
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
 const { DisperserClient } = require('../eigenDA/bindings/disperser/disperser_grpc_pb');
 const { DisperseBlobRequest, BlobStatusRequest, RetrieveBlobRequest } = require('../eigenDA/bindings/disperser/disperser_pb');
 
 const EIGEN_ENDPOINT = 'disperser-holesky.eigenda.xyz:443';
 
-var pinataApiKey='';
-var pinataSecretApiKey='';
-var rpcBaseAddress='';
-var privateKey='';
+var pinataApiKey = '';
+var pinataSecretApiKey = '';
+var rpcBaseAddress = '';
+var privateKey = '';
 let client;
 
 function init() {
@@ -40,12 +40,12 @@ async function sendTask(proofOfTask, data, taskDefinitionId) {
       sig,
     ]
   };
-    try {
-      const provider = new ethers.JsonRpcProvider(rpcBaseAddress);
-      const response = await provider.send(jsonRpcBody.method, jsonRpcBody.params);
-      console.log("API response:", response);
+  try {
+    const provider = new ethers.JsonRpcProvider(rpcBaseAddress);
+    const response = await provider.send(jsonRpcBody.method, jsonRpcBody.params);
+    console.log("API response:", response);
   } catch (error) {
-      console.error("Error making API request:", error);
+    console.error("Error making API request:", error);
   }
 }
 
@@ -76,10 +76,10 @@ function pollForBlobStatus(client, cid, interval = 30000) {
         const statusResponse = await getBlobStatus(client, statusRequest);
         const blobIndex = statusResponse.getInfo()?.getBlobVerificationProof()?.getBlobIndex();
         const batchHeaderHash = statusResponse.getInfo()?.getBlobVerificationProof()?.getBatchMetadata()?.getBatchHeaderHash();
-        
+
         if (blobIndex && batchHeaderHash) {
           clearInterval(poll); // Stop polling once we have valid data
-          
+
           const retrieveRequest = new RetrieveBlobRequest();
           retrieveRequest.setBlobIndex(blobIndex);
           retrieveRequest.setBatchHeaderHash(batchHeaderHash);
@@ -110,7 +110,7 @@ function getBlobStatus(client, request) {
   });
 }
 
-function disperseBlob(client, request){
+function disperseBlob(client, request) {
   return new Promise((resolve, reject) => {
     client.disperseBlob(request, (err, response) => {
       if (err) {

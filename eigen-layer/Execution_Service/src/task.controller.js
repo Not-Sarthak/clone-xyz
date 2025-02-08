@@ -2,7 +2,6 @@
 const { Router } = require("express")
 const CustomError = require("./utils/validateError");
 const CustomResponse = require("./utils/validateResponse");
-const oracleService = require("./oracle.service");
 const dalService = require("./dal.service");
 
 const router = Router()
@@ -10,17 +9,31 @@ const router = Router()
 router.post("/execute", async (req, res) => {
     console.log("Executing task");
 
-    try {
-        var taskDefinitionId = Number(req.body.taskDefinitionId) || 0;
-        console.log(`taskDefinitionId: ${taskDefinitionId}`);
+    var taskDefinitionId = Number(req.body.taskDefinitionId) || 0;
+    console.log(`taskDefinitionId: ${taskDefinitionId}`);
+    var threadId = req.body.threadId || 0;
+    console.log(`threadId: ${threadId}`);
+    var assistantId = req.body.assistantId || 0;
+    console.log(`assistantId: ${assistantId}`);
 
-        const result = await oracleService.getPrice("ETHUSDT");
-        result.price = req.body.fakePrice || result.price;
-        const [cid, poll] = await dalService.publishToEigenDA(result);
-        const data = "hello";
-        res.status(200).send(new CustomResponse({proofOfTask: cid, data: data, taskDefinitionId: taskDefinitionId}, "Blob dispersion started. Task will be submitted after blob is dispersed."));
+    try {
+        let data = {
+            threadId: threadId,
+            assistantId: assistantId
+        }
+        const [cid, poll] = await dalService.publishToEigenDA(data);
+        res.status(200).send(new CustomResponse(
+            {
+                proofOfTask: cid,
+                data: data,
+                taskDefinitionId: taskDefinitionId
+            },
+            "Blob dispersion started. Task will be submitted after blob is dispersed."
+        ));
+
         const blob = await poll;
         console.log(`blob data: ${blob}`);
+        data = JSON.stringify(data);
         await dalService.sendTask(cid, data, taskDefinitionId);
     } catch (error) {
         console.log(error);
