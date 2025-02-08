@@ -25,6 +25,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   const saveMessages = useChatStore((state) => state.saveMessages);
+  const selectedModel = useChatStore((state) => state.selectedModel);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -67,9 +68,10 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
 
       setInput("");
 
+      // Use the selected model's endpoint
       const response = await axios({
         method: "post",
-        url: `${window.location.origin}/api/chat`,
+        url: `${window.location.origin}${selectedModel.endpoint}`,
         data: {
           message: trimmedInput,
         },
@@ -82,7 +84,10 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
         const assistantMessage: Message = {
           id: generateId(),
           role: "assistant",
-          content: response.data.content,
+          // Handle different response formats from different models
+          content: selectedModel.value === 'eliza' 
+            ? response.data.response 
+            : response.data.content,
         };
 
         setMessages((prev) => {
@@ -98,7 +103,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       console.error("Full error:", error);
       setLoadingSubmit(false);
       setIsLoading(false);
-      toast.error("Failed to send message");
+      toast.error(error.response?.data?.error || "Failed to send message");
     }
   };
 
@@ -130,6 +135,18 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     }, 0);
   };
 
+  // Helper function to get model-specific placeholder text
+  const getPlaceholderText = () => {
+    switch (selectedModel.value) {
+      case 'eliza':
+        return "Chat with Eliza Flow...";
+      case 'gpt':
+        return "Chat with GPT...";
+      default:
+        return "Type your message...";
+    }
+  };
+
   return (
     <div className="flex flex-col w-full max-w-3xl h-full">
       <ChatTopbar
@@ -143,7 +160,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
         <div className="flex flex-col h-full w-full items-center gap-4 justify-center">
           <CloneLogo className="w-10 h-10" />
           <p className="text-center text-base text-muted-foreground">
-            How can I help you today?
+            {`Chat with ${selectedModel.label}`}
           </p>
           <div className="w-full flex flex-col gap-2">
             <ChatBottombar
@@ -153,6 +170,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
               isLoading={isLoading}
               stop={stop}
               setInput={setInput}
+              placeholder={getPlaceholderText()}
             />
             <div className="flex items-center flex-wrap justify-center gap-2 px-4 pb-4">
               {suggestions.map((suggestion, index) => (
@@ -187,6 +205,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
             isLoading={isLoading}
             stop={stop}
             setInput={setInput}
+            placeholder={getPlaceholderText()}
           />
         </>
       )}

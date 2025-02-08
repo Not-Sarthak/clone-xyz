@@ -20,6 +20,7 @@ interface ChatBottombarProps {
   stop: () => void;
   input: string;
   setInput?: React.Dispatch<React.SetStateAction<string>>;
+  placeholder?: string;
 }
 
 export default function ChatBottombar({
@@ -28,10 +29,12 @@ export default function ChatBottombar({
   handleSubmit,
   isLoading,
   stop,
+  placeholder,
 }: ChatBottombarProps) {
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const base64Images = useChatStore((state) => state.base64Images);
   const setBase64Images = useChatStore((state) => state.setBase64Images);
+  const selectedModel = useChatStore((state) => state.selectedModel);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -58,6 +61,32 @@ export default function ChatBottombar({
     }
   }, [inputRef]);
 
+  const getPlaceholderText = () => {
+    if (placeholder) return placeholder;
+    
+    switch (selectedModel.value) {
+      case 'eliza':
+        return "Chat with Eliza Flow...";
+      case 'gpt':
+        return "Chat with GPT...";
+      default:
+        return "Enter your prompt here";
+    }
+  };
+
+  const renderImagePicker = () => {
+    if (selectedModel.value === 'eliza') {
+      return null;
+    }
+
+    return (
+      <MultiImagePicker
+        disabled={isLoading}
+        onImagesPick={(images) => setBase64Images(images)}
+      />
+    );
+  };
+
   return (
     <div className="px-4 pb-7 flex justify-between w-full items-center relative">
       <AnimatePresence initial={false}>
@@ -71,14 +100,14 @@ export default function ChatBottombar({
             onKeyDown={handleKeyPress}
             onChange={handleInputChange}
             name="message"
-            placeholder="Enter your prompt here"
+            placeholder={getPlaceholderText()}
             className="max-h-40 px-6 pt-6 border-0 shadow-none bg-[#f4f4f4] rounded-lg text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed dark:bg-card"
           />
 
           <div className="flex w-full items-center p-2">
             {isLoading ? (
               <div className="flex w-full justify-between">
-                <MultiImagePicker disabled onImagesPick={setBase64Images} />
+                {renderImagePicker()}
                 <div>
                   <Button
                     className="shrink-0 rounded-full"
@@ -93,10 +122,7 @@ export default function ChatBottombar({
               </div>
             ) : (
               <div className="flex w-full justify-between">
-                <MultiImagePicker
-                  disabled={isLoading}
-                  onImagesPick={setBase64Images}
-                />
+                {renderImagePicker()}
                 <div>
                   <Button
                     className="shrink-0 cursor-pointer bg-[#f4f4f4] hover:scale-95 hover:bg-[#f4f4f4]/50 transition-all duration-200 rounded-full"
@@ -111,8 +137,9 @@ export default function ChatBottombar({
               </div>
             )}
           </div>
-          {base64Images && base64Images.length > 0 && (
-            <div className="w-full flex px-2 pb-2 gap-2">
+
+          {base64Images && base64Images.length > 0 && selectedModel.value !== 'eliza' && (
+            <div className="w-full flex flex-wrap px-2 pb-2 gap-2">
               {base64Images.map((image, index) => (
                 <div
                   key={index}

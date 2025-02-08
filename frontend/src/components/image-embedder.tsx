@@ -4,13 +4,19 @@ import React, { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "./ui/button";
 import { ImageIcon } from "lucide-react";
+import { cx } from "@/lib/utils"; 
 
 interface MultiImagePickerProps {
   onImagesPick: (base64Images: string[]) => void;
-  disabled: boolean
+  disabled: boolean;
+  className?: string; 
 }
 
-const MultiImagePicker: React.FC<MultiImagePickerProps> = ({ onImagesPick, disabled }) => {
+const MultiImagePicker: React.FC<MultiImagePickerProps> = ({ 
+  onImagesPick, 
+  disabled,
+  className 
+}) => {
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -42,9 +48,15 @@ const MultiImagePicker: React.FC<MultiImagePickerProps> = ({ onImagesPick, disab
   });
 
   return (
-    <div {...getRootProps()} className="cursor-pointer">
+    <div {...getRootProps()} className={cx("cursor-pointer", className)}>
       <input disabled={disabled} {...getInputProps()} />
-      <Button disabled={disabled} type="button" variant="ghost" size="icon" className="rounded-full shrink-0">
+      <Button 
+        disabled={disabled} 
+        type="button" 
+        variant="ghost" 
+        size="icon" 
+        className="rounded-full shrink-0"
+      >
         <ImageIcon className="w-5 h-5" />
         {isDragActive && <span className="sr-only">Drop the images here</span>}
       </Button>
