@@ -19,7 +19,7 @@ class ChatService {
   private client: OpenAI;
   private assistant: Assistant | null = null;
   private threads: Map<string, Thread> = new Map();
-  private latestResponse: ChatResponse | null = null;  
+  private latestResponse: ChatResponse | null = null;
 
   constructor() {
     this.client = new OpenAI({
@@ -52,7 +52,6 @@ class ChatService {
     try {
       const assistant = await this.getOrCreateAssistant();
       const thread = await this.getOrCreateThread(threadId);
-      
       await this.client.beta.threads.messages.create(thread.id, {
         role: "user",
         content: message
@@ -70,7 +69,6 @@ class ChatService {
             annotations: runResponse.text.annotations || []
           }
         };
-        
         this.latestResponse = response;  // Store the latest response
         return response;
       }

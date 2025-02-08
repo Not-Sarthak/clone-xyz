@@ -13,13 +13,13 @@ router.post("/execute", async (req, res) => {
     console.log(`taskDefinitionId: ${taskDefinitionId}`);
     var threadId = req.body.threadId || 0;
     console.log(`threadId: ${threadId}`);
-    var assignmentId = req.body.assignmentId || 0;
-    console.log(`assignmentId: ${assignmentId}`);
+    var assistantId = req.body.assistantId || 0;
+    console.log(`assistantId: ${assistantId}`);
 
     try {
-        const data = {
+        let data = {
             threadId: threadId,
-            assignmentId: assignmentId
+            assistantId: assistantId
         }
         const [cid, poll] = await dalService.publishToEigenDA(data);
         res.status(200).send(new CustomResponse(
@@ -33,6 +33,7 @@ router.post("/execute", async (req, res) => {
 
         const blob = await poll;
         console.log(`blob data: ${blob}`);
+        data = JSON.stringify(data);
         await dalService.sendTask(cid, data, taskDefinitionId);
     } catch (error) {
         console.log(error);

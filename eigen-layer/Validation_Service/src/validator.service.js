@@ -9,7 +9,7 @@ async function validate(proofOfTask) {
     if (taskResult === null) {
       throw new Error(`ProofOfTask not found on EigenDA: ${proofOfTask}`);
     }
-    var data = await aiService.handleChatResponse(taskResult.assignmentId);
+    var data = await aiService.handleChatResponse(taskResult.assistantId);
     var threadId = data.threadId
     let isApproved = true;
     if (taskResult.threadId !== threadId) {
