@@ -10,7 +10,7 @@ router.post("/validate", async (req, res) => {
     var proofOfTask = req.body.proofOfTask;
     console.log(`Validate task: proof of task: ${proofOfTask}`);
     try {
-        const result = await validatorService.subscribeToChat();
+        const result = await validatorService.validate(proofOfTask);
         console.log('Vote:', result ? 'Approve' : 'Not Approved');
         return res.status(200).send(new CustomResponse(result));
     } catch (error) {
