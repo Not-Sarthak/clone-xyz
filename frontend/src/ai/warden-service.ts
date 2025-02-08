@@ -21,15 +21,17 @@ class WardenService {
   async processMessage(message: string): Promise<WardenResponse> {
     try {
       const { agent, config } = await this.getOrCreateAgent();
-      
+
       const result = await agent.invoke(
         { input: message },
-        config 
+        config
       );
+
+      // console.log('Warden result:', result);
 
       return {
         threadId: config.configurable.thread_id,
-        content: result.output || 'No response generated'
+        content: result.messages[2].content || 'No response generated'
       };
     } catch (error) {
       console.error('Warden service error:', error);
