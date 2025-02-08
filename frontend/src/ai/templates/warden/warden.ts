@@ -18,7 +18,7 @@ async function initializeAgent() {
         const agentkit = new WardenAgentKit(config);
         const wardenToolkit = new WardenToolkit(agentkit);
         const tools = wardenToolkit.getTools();
-        
+
         const newTool = new WardenTool(
             sarthakTool,
             agentkit
@@ -28,7 +28,7 @@ async function initializeAgent() {
         const memory = new MemorySaver();
         const threadId = `warden-thread-${Date.now()}`;
 
-        const agent = await createReactAgent({
+        const agent = createReactAgent({
             llm,
             tools,
             checkpointSaver: memory,
@@ -39,8 +39,8 @@ async function initializeAgent() {
             Always provide a response, never return empty or "No response generated".`,
         });
 
-        return { 
-            agent, 
+        return {
+            agent,
             config: {
                 configurable: { thread_id: threadId }
             }
