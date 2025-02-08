@@ -1,5 +1,4 @@
 require('dotenv').config();
-const pinataSDK = require("@pinata/sdk");
 const { ethers } = require('ethers');
 const grpc = require('@grpc/grpc-js');
 const { DisperserClient } = require('../eigenDA/bindings/disperser/disperser_grpc_pb');
@@ -7,15 +6,11 @@ const { DisperseBlobRequest, BlobStatusRequest, RetrieveBlobRequest } = require(
 
 const EIGEN_ENDPOINT = 'disperser-holesky.eigenda.xyz:443';
 
-var pinataApiKey = '';
-var pinataSecretApiKey = '';
 var rpcBaseAddress = '';
 var privateKey = '';
 let client;
 
 function init() {
-  pinataApiKey = process.env.PINATA_API_KEY;
-  pinataSecretApiKey = process.env.PINATA_SECRET_API_KEY;
   rpcBaseAddress = process.env.OTHENTIC_CLIENT_RPC_ADDRESS;
   privateKey = process.env.PRIVATE_KEY;
   client = new DisperserClient(EIGEN_ENDPOINT, grpc.credentials.createSsl());

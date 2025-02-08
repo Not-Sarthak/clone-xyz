@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server';
 import { chatService } from '@/ai/ai-service';
 
 export async function POST() {
+  console.log('🟡 Subscribing to chat...');
   try {
     const result = await chatService.getLatestResponse();
-    
+
     if (!result) {
       return NextResponse.json(
         { error: 'No chat response available yet' },
