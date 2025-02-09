@@ -18,34 +18,34 @@ export function AgentAnalytics() {
           id="agent-analytics"
           className="relative scroll-my-24 text-lg font-semibold tracking-tight text-orange-500"
         >
-          Trade Analytics
+          AI Trading Agents
           <div className="absolute top-1 -left-[8px] h-5 w-[3px] rounded-r-sm bg-orange-500" />
         </h2>
-        <p className="mt-2 max-w-lg text-3xl font-semibold tracking-tighter text-balance text-gray-900 md:text-4xl">
-          Deploy AI trading agents across platforms in minutes
+        <p className="mt-2 max-w-lg text-3xl font-semibold tracking-tighter text-gray-900 md:text-4xl">
+          Deploy AI-powered trading bots seamlessly across platforms
         </p>
       </div>
-      <Divider className="mt-0"></Divider>
+      <Divider className="mt-0" />
       <div className="grid grid-cols-1 grid-rows-2 gap-6 md:grid-cols-4 md:grid-rows-1">
         <StickerCard
           Icon={RiDiscordFill}
-          title="Discord Ready"
-          description="One-click deployment to any Discord server channel"
+          title="Social Integration"
+          description="Instantly integrate agents into Discord and Telegram channels."
         />
         <StickerCard
           Icon={RiTelegramFill}
-          title="Telegram Integration"
-          description="Seamlessly add trading bots to Telegram groups"
+          title="Gaia AI-Powered"
+          description="Customize trading agents with Gaia&apos;s knowledge base and AI models."
         />
         <StickerCard
           Icon={RiRocket2Fill}
-          title="Eigenlayer-Powered"
-          description="Deploy and validate agents using Eigenlayer"
+          title="Eigenlayer Verified"
+          description="Secure and validate agents with Eigenlayer."
         />
         <StickerCard
           Icon={RiRobot2Fill}
-          title="Agent Templates"
-          description="Pre-built strategies ready for customization"
+          title="Prebuilt Templates"
+          description="Use ready-made templates and customize as needed."
         />
       </div>
     </section>

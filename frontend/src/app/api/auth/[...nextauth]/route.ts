@@ -86,7 +86,7 @@ export const authOptions: AuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -107,7 +107,6 @@ export const authOptions: AuthOptions = {
           session.chainId = parseInt(chainId, 10);
           session.sessionToken = token.sub;
 
-          // Update or create session in database
           const wallet = await prisma.wallet.findFirst({
             where: { userAddress: address }
           });

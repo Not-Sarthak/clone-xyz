@@ -1,3 +1,5 @@
+import { vrfTool } from "./flow/vrf-tool";
+
 export interface ToolConfig<T = any> {
     definition: {
         type: 'function';
@@ -16,4 +18,5 @@ export interface ToolConfig<T = any> {
 
 export const tools: Record<string, ToolConfig> = {
     // Export Tools Here
+    "query_vrf": vrfTool,
 }

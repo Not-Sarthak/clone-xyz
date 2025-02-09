@@ -31,7 +31,7 @@ export function Hero() {
           <br />
         </h1>
         <p className="mt-5 max-w-xl text-center text-base text-balance text-gray-700 sm:mt-8 sm:text-xl">
-          <FadeSpan>Drop AI agents into your Discord & Telegram, </FadeSpan>{" "}
+          <FadeSpan>Drop Verifiable AI agents into your Discord & Telegram, </FadeSpan>{" "}
           <FadeSpan>automate your degen space,</FadeSpan>{" "}
           <FadeSpan>and let them cook while you chill!</FadeSpan>
         </p>

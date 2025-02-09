@@ -82,7 +82,7 @@ export default function ChatTopbar({ chatId, messages }: ChatTopbarProps) {
                 : 'hover:text-orange-500'
             }`}
           >
-            Profile
+            Swarm Mode
             <span className={`absolute -bottom-1 left-0 h-0.5 w-full transform bg-orange-500 transition-all duration-200 ${
               pathname === '/profile' 
                 ? 'scale-x-100' 
@@ -170,7 +170,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
           </Link>
           <Link href="/voice" className="w-full">
             <Button variant="ghost" className="w-full justify-start">
-              Profile
+              Swarm Mode
             </Button>
           </Link>
         </div>

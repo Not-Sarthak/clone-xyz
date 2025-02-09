@@ -10,11 +10,15 @@ import React from "react";
 import { CloneLogo } from "../../../public/clone-logo";
 import { AuthModal } from "../modal/auth-modal";
 import { Button } from "../buttons/button";
-
+import { useAccount } from "wagmi";
+import { WalletConnectionHandler } from "../wallet/wallet-connection-handler";
 export function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [showAuthModal, setShowAuthModal] = React.useState(false);
   const scrolled = useScroll(15);
+
+  const { isConnected } = useAccount();
+  console.log(isConnected);
 
   return (
     <>
@@ -65,7 +69,7 @@ export function NavBar() {
             </nav>
 
             <div className="hidden items-center gap-2 lg:flex">
-              <appkit-button />
+              <WalletConnectionHandler />
             </div>
 
             <Button
@@ -115,7 +119,7 @@ export function NavBar() {
                   </li>
                 </ul>
                 <div className="flex justify-center">
-                  <appkit-button />
+                  <WalletConnectionHandler />
                 </div>
               </motion.nav>
             )}

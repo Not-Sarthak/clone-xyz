@@ -12,6 +12,11 @@ export const models = [
         value: "eliza",
         label: "Eliza Flow",
         endpoint: "/api/flow-eliza"
+    },
+    {
+        value: "warden",
+        label: "Warden",
+        endpoint: "/api/warden"
     }
 ] as const;
 
