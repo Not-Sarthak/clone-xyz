@@ -69,7 +69,7 @@ class ChatService {
             annotations: runResponse.text.annotations || []
           }
         };
-        this.latestResponse = response;  // Store the latest response
+        this.latestResponse = response;
         return response;
       }
 

@@ -5,6 +5,7 @@ import {
   flowTestnet,
   arbitrum,
   arbitrumSepolia,
+  sepolia,
 } from "@reown/appkit/networks"
 import {
   type SIWESession,
@@ -20,6 +21,7 @@ export const projectId =
   process.env.NEXT_PUBLIC_PROJECT_ID || "b56e18d47c72ab683b10814fe9495694"
 
 export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [
+  sepolia,
   flowMainnet,
   flowTestnet,
   arbitrum,

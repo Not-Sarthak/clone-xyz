@@ -3,7 +3,7 @@ import { WardenToolkit, WardenTool } from "@wardenprotocol/warden-langchain";
 import { MemorySaver } from "@langchain/langgraph";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatOpenAI } from "@langchain/openai";
-import { sarthakTool } from "./tool";
+import { sarthakTool } from "./aave-tool";
 
 async function initializeAgent() {
     try {

@@ -10,9 +10,9 @@ export async function getSessionAddress() {
     const token = await getToken({
       req: {
         cookies: Object.fromEntries(
-          cookieStore.getAll().map(c => [c.name, c.value])
+          (await cookieStore).getAll().map(c => [c.name, c.value])
         ),
-        headers: Object.fromEntries(headersList.entries()),
+        headers: Object.fromEntries((await headersList).entries()),
       } as any,
       secret: process.env.NEXTAUTH_SECRET,
     });

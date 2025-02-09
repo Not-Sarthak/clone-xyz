@@ -6,7 +6,7 @@ import { TEMPLATES } from "@/utils/data"
 import Footer from "@/components/ui/footer"
 import { NavBar } from "@/components/headers/tubelight-navbar"
 import { RiAppsLine, RiRobot2Line, RiTeamLine, RiCloseLine, RiCheckLine, RiDiscordFill, RiTelegramFill, RiAddLine } from "@remixicon/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/buttons/button"
 
@@ -91,6 +91,27 @@ const AgentConfigCard = ({
   onDelete: () => void
   onChange: (updatedConfig: AgentConfig) => void
 }) => {
+  const [isDragging, setIsDragging] = useState(false)
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = () => {
+    setIsDragging(false)
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length > 0) {
+      onChange({ ...config, customCharacter: files[0].name })
+    }
+  }
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -107,16 +128,29 @@ const AgentConfigCard = ({
       
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Agent Functionality</label>
-          <select 
-            value={config.functionality}
-            onChange={(e) => onChange({ ...config, functionality: e.target.value })}
-            className="mt-1 block w-full rounded-md bg-white py-2 px-3 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 sm:text-sm"
-          >
-            <option>Agent 1</option>
-            <option>Agent 2</option>
-            <option>Agent 3</option>
-          </select>
+          <label className="block text-sm font-medium text-gray-700">Agent Type</label>
+          <div className="mt-2 flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="DeFi"
+                checked={config.functionality === "DeFi"}
+                onChange={(e) => onChange({ ...config, functionality: e.target.value })}
+                className="h-4 w-4 text-orange-500 focus:ring-orange-500"
+              />
+              <span className="ml-2 text-sm text-gray-700">DeFi Agents</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="Social"
+                checked={config.functionality === "Social"}
+                onChange={(e) => onChange({ ...config, functionality: e.target.value })}
+                className="h-4 w-4 text-orange-500 focus:ring-orange-500"
+              />
+              <span className="ml-2 text-sm text-gray-700">Social Agents</span>
+            </label>
+          </div>
         </div>
 
         <div>
@@ -135,13 +169,27 @@ const AgentConfigCard = ({
         {config.character === "OpenAI" && (
           <div>
             <label className="block text-sm font-medium text-gray-700">Custom Character</label>
-            <input
-              type="text"
-              value={config.customCharacter || ""}
-              onChange={(e) => onChange({ ...config, customCharacter: e.target.value })}
-              placeholder="Describe your character..."
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
-            />
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`mt-1 cursor-pointer rounded-md border-2 border-dashed p-4 transition-colors ${
+                isDragging ? 'border-orange-500 bg-orange-50' : 'border-gray-300 hover:border-orange-500'
+              }`}
+            >
+              <div className="text-center">
+                <p className="text-sm text-gray-500">
+                  Drop character file here or click to describe your character
+                </p>
+              </div>
+              <textarea
+                value={config.customCharacter || ""}
+                onChange={(e) => onChange({ ...config, customCharacter: e.target.value })}
+                placeholder="Describe your character or drop a file..."
+                className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                rows={3}
+              />
+            </div>
           </div>
         )}
       </div>
@@ -154,8 +202,14 @@ const LaunchAgentModal = ({ isOpen, onClose }: LaunchAgentModalProps) => {
     { id: '1', functionality: 'Agent 1', character: 'OpenAI' }
   ])
   const [isSwarmEnabled, setIsSwarmEnabled] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [showTooltip, setShowTooltip] = useState(false)
+  const [showBotTokenInput, setShowBotTokenInput] = useState(false)
+  const [botToken, setBotToken] = useState('')
 
   const addAgent = () => {
+    if (!isSwarmEnabled) return
     if (agents.length < 4) {
       const newId = (agents.length + 1).toString()
       setAgents([...agents, { id: newId, functionality: 'Agent 1', character: 'OpenAI' }])
@@ -163,6 +217,7 @@ const LaunchAgentModal = ({ isOpen, onClose }: LaunchAgentModalProps) => {
   }
 
   const removeAgent = (id: string) => {
+    if (!isSwarmEnabled) return
     if (agents.length > 1) {
       setAgents(agents.filter(agent => agent.id !== id))
     }
@@ -171,6 +226,50 @@ const LaunchAgentModal = ({ isOpen, onClose }: LaunchAgentModalProps) => {
   const updateAgent = (id: string, updatedConfig: AgentConfig) => {
     setAgents(agents.map(agent => agent.id === id ? updatedConfig : agent))
   }
+
+  useEffect(() => {
+    if (!isSwarmEnabled && agents.length > 1) {
+      setAgents([agents[0]])
+    }
+  }, [isSwarmEnabled])
+
+  const handleTelegramClick = () => {
+    setShowBotTokenInput(true)
+  }
+
+  const handleLaunch = async () => {
+    if (!botToken.trim()) {
+      return // Don't proceed if token is empty
+    }
+    
+    setIsLoading(true)
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    
+    setIsLoading(false)
+    setShowSuccess(true)
+    
+    // Close modal after showing success message
+    setTimeout(() => {
+      setShowSuccess(false)
+      onClose()
+    }, 1500)
+  }
+
+  const BotTokenInstructions = () => (
+    <div className="mt-4 space-y-3 text-sm text-gray-600">
+      <p className="font-medium text-gray-900">How to get your Telegram Bot Token:</p>
+      <ol className="list-decimal space-y-2 pl-4">
+        <li>Open Telegram and search for <span className="font-medium">@BotFather</span></li>
+        <li>Start a chat and send the command <span className="font-mono bg-gray-100 px-1">/newbot</span></li>
+        <li>Follow the instructions to create your bot</li>
+        <li>BotFather will send you a token that looks like: <span className="font-mono text-xs bg-gray-100 px-1">123456789:ABCdefGHIjklMNOpqrsTUVwxyz</span></li>
+        <li>Copy and paste that token here</li>
+      </ol>
+      <p className="mt-4 text-xs text-gray-500">Note: Keep your token secure and never share it publicly</p>
+    </div>
+  )
 
   if (!isOpen) return null
 
@@ -191,6 +290,26 @@ const LaunchAgentModal = ({ isOpen, onClose }: LaunchAgentModalProps) => {
             className="relative w-full max-w-2xl my-8"
           >
             <div className="relative overflow-hidden rounded-xl bg-white shadow-xl">
+              {isLoading && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent"></div>
+                    <p className="text-sm text-gray-600">Deploying Agents...</p>
+                  </div>
+                </div>
+              )}
+
+              {showSuccess && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                      <RiCheckLine className="h-6 w-6 text-green-600" />
+                    </div>
+                    <p className="text-sm font-medium text-gray-900">Agents Deployed Successfully!</p>
+                  </div>
+                </div>
+              )}
+
               <div className="absolute right-4 top-4 z-10">
                 <button
                   onClick={onClose}
@@ -204,7 +323,11 @@ const LaunchAgentModal = ({ isOpen, onClose }: LaunchAgentModalProps) => {
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900">Launch Your Agents</h3>
-                    <p className="mt-1 text-sm text-gray-500">Configure one or more agents to work together</p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {isSwarmEnabled 
+                        ? "Configure multiple agents to work together" 
+                        : "Configure your agent"}
+                    </p>
                   </div>
 
                   <div className="max-h-[60vh] overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
@@ -218,7 +341,7 @@ const LaunchAgentModal = ({ isOpen, onClose }: LaunchAgentModalProps) => {
                     ))}
                   </div>
 
-                  {agents.length < 4 && (
+                  {isSwarmEnabled && agents.length < 4 && (
                     <button
                       onClick={addAgent}
                       className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 p-4 text-sm text-gray-500 hover:border-orange-500 hover:text-orange-500"
@@ -229,7 +352,10 @@ const LaunchAgentModal = ({ isOpen, onClose }: LaunchAgentModalProps) => {
                   )}
 
                   <div className="flex items-center justify-between border-t pt-4">
-                    <span className="text-sm font-medium text-gray-900">Enable Swarm Mode</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-900">Enable Swarm Mode</span>
+                      <span className="text-xs text-gray-500">(Multiple Agents)</span>
+                    </div>
                     <button
                       onClick={() => setIsSwarmEnabled(!isSwarmEnabled)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
@@ -244,14 +370,81 @@ const LaunchAgentModal = ({ isOpen, onClose }: LaunchAgentModalProps) => {
                     </button>
                   </div>
 
-                  <Button 
-                    onClick={() => {
-                      onClose()
-                    }}
-                    className="w-full"
-                  >
-                    Launch Agents
-                  </Button>
+                  {showBotTokenInput ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="space-y-4"
+                    >
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Telegram Bot Token
+                        </label>
+                        <div className="mt-1">
+                          <input
+                            type="text"
+                            value={botToken}
+                            onChange={(e) => setBotToken(e.target.value)}
+                            placeholder="Enter your bot token"
+                            className="block w-full rounded-md py-2 px-1 border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <BotTokenInstructions />
+
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setShowBotTokenInput(false)}
+                          className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        >
+                          Back
+                        </button>
+                        <button
+                          onClick={handleLaunch}
+                          disabled={!botToken.trim() || isLoading}
+                          className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-[#229ED9] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#1C85B7] disabled:opacity-50"
+                        >
+                          {isLoading ? (
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          ) : (
+                            <>
+                              <RiTelegramFill className="h-4 w-4" />
+                              Launch Bot
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div 
+                        className="relative"
+                        onMouseEnter={() => setShowTooltip(true)}
+                        onMouseLeave={() => setShowTooltip(false)}
+                      >
+                        <button
+                          disabled
+                          className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#5865F2]/50 px-4 py-2.5 text-sm font-medium text-white cursor-not-allowed"
+                        >
+                          <RiDiscordFill className="h-4 w-4" />
+                          Launch on Discord
+                        </button>
+                        {showTooltip && (
+                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-xs rounded">
+                            Coming Soon
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={handleTelegramClick}
+                        className="flex items-center justify-center gap-2 rounded-lg bg-[#229ED9] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#1C85B7]"
+                      >
+                        <RiTelegramFill className="h-4 w-4" />
+                        Launch on Telegram
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
