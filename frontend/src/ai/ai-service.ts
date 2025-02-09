@@ -27,7 +27,6 @@ class ChatService {
     });
   }
 
-  // Add this new method
   async getLatestResponse(): Promise<ChatResponse | null> {
     return this.latestResponse;
   }
